@@ -43,53 +43,119 @@
             max-width: 400px;
         }
 
-        .arc-ring {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            border: 2px solid rgba(0, 212, 255, 0.15);
+        /* === ARC REACTOR === */
+        .reactor-container {
+            position: relative;
+            width: 220px;
+            height: 220px;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            animation: pulse-subtle 4s ease-in-out infinite;
         }
 
-        .arc-ring::before {
-            content: '';
+        /* Outer rotating ring */
+        .ring-outer {
             position: absolute;
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            border: 1px solid rgba(0, 212, 255, 0.08);
-            transform: scale(1.2);
+            border: 1px solid transparent;
+            border-top: 1px solid rgba(0, 212, 255, 0.4);
+            border-right: 1px solid rgba(0, 212, 255, 0.15);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.4);
+            border-left: 1px solid rgba(0, 212, 255, 0.15);
+            animation: spin-slow 12s linear infinite;
         }
 
-        .arc-ring.active {
-            border-color: rgba(0, 212, 255, 0.6);
-            box-shadow: 0 0 40px rgba(0, 212, 255, 0.15), inset 0 0 40px rgba(0, 212, 255, 0.05);
-            animation: pulse-active 2s ease-in-out infinite;
+        /* Second rotating ring (counter-rotation) */
+        .ring-mid {
+            position: absolute;
+            width: 88%;
+            height: 88%;
+            border-radius: 50%;
+            border: 1px solid transparent;
+            border-top: 1px solid rgba(0, 212, 255, 0.3);
+            border-left: 1px solid rgba(0, 212, 255, 0.3);
+            animation: spin-reverse 8s linear infinite;
         }
 
+        /* Inner pulsing ring */
+        .ring-inner {
+            position: absolute;
+            width: 76%;
+            height: 76%;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 212, 255, 0.25);
+            animation: pulse-glow 3s ease-in-out infinite;
+            box-shadow:
+                0 0 15px rgba(0, 212, 255, 0.08),
+                inset 0 0 15px rgba(0, 212, 255, 0.05);
+        }
+
+        /* Core glow behind the letter */
+        .core-glow {
+            position: absolute;
+            width: 60%;
+            height: 60%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.06) 0%, transparent 70%);
+            animation: core-breathe 4s ease-in-out infinite;
+        }
+
+        /* Orbital dots */
+        .orbital {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: spin-slow 12s linear infinite;
+        }
+
+        .orbital-dot {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(0, 212, 255, 0.7);
+            box-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+        }
+
+        .orbital-dot:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); }
+        .orbital-dot:nth-child(2) { bottom: 0; left: 50%; transform: translateX(-50%); }
+        .orbital-dot:nth-child(3) { top: 50%; left: 0; transform: translateY(-50%); }
+        .orbital-dot:nth-child(4) { top: 50%; right: 0; transform: translateY(-50%); }
+
+        .orbital-2 {
+            animation: spin-reverse 8s linear infinite;
+        }
+
+        .orbital-2 .orbital-dot {
+            width: 3px;
+            height: 3px;
+            background: rgba(0, 180, 255, 0.5);
+            box-shadow: 0 0 6px rgba(0, 180, 255, 0.3);
+        }
+
+        .orbital-2 .orbital-dot:nth-child(1) { top: 6%; left: 50%; }
+        .orbital-2 .orbital-dot:nth-child(2) { bottom: 6%; left: 50%; }
+
+        /* The N */
         .initial {
             font-size: 4.5rem;
             font-weight: 200;
             color: #00d4ff;
             letter-spacing: 0.05em;
-            opacity: 0.9;
+            z-index: 2;
+            animation: letter-glow 3s ease-in-out infinite;
         }
 
-        .arc-ring.active .initial {
-            opacity: 1;
-            text-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
-        }
-
-        .title {
-            font-size: 0.75rem;
-            letter-spacing: 0.4em;
-            text-transform: uppercase;
-            color: rgba(255, 255, 255, 0.35);
-            font-weight: 300;
+        /* Scan line effect */
+        .scan-line {
+            position: absolute;
+            width: 76%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(0, 212, 255, 0.3) 50%, transparent 100%);
+            animation: scan 4s ease-in-out infinite;
+            opacity: 0.6;
         }
 
         .name {
@@ -98,9 +164,15 @@
             letter-spacing: 0.15em;
             color: rgba(255, 255, 255, 0.85);
             margin-bottom: 0.5rem;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.15);
         }
 
         .title {
+            font-size: 0.75rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 300;
             margin-top: 0.3rem;
         }
 
@@ -121,31 +193,83 @@
             color: rgba(0, 255, 136, 0.8);
         }
 
+        /* Ambient particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(0, 212, 255, 0.3);
+            border-radius: 50%;
+            animation: float-up linear infinite;
+        }
+
         elevenlabs-convai {
             position: fixed;
             bottom: 2rem;
             right: 50%;
             transform: translateX(50%);
+            z-index: 10;
         }
 
-        @keyframes pulse-subtle {
-            0%, 100% { border-color: rgba(0, 212, 255, 0.15); }
-            50% { border-color: rgba(0, 212, 255, 0.25); }
+        /* === ANIMATIONS === */
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
-        @keyframes pulse-active {
+        @keyframes spin-reverse {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+
+        @keyframes pulse-glow {
             0%, 100% {
-                border-color: rgba(0, 212, 255, 0.6);
-                box-shadow: 0 0 40px rgba(0, 212, 255, 0.15), inset 0 0 40px rgba(0, 212, 255, 0.05);
+                border-color: rgba(0, 212, 255, 0.25);
+                box-shadow: 0 0 15px rgba(0, 212, 255, 0.08), inset 0 0 15px rgba(0, 212, 255, 0.05);
             }
             50% {
-                border-color: rgba(0, 212, 255, 0.9);
-                box-shadow: 0 0 60px rgba(0, 212, 255, 0.25), inset 0 0 60px rgba(0, 212, 255, 0.08);
+                border-color: rgba(0, 212, 255, 0.5);
+                box-shadow: 0 0 30px rgba(0, 212, 255, 0.15), inset 0 0 30px rgba(0, 212, 255, 0.08);
             }
+        }
+
+        @keyframes core-breathe {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        @keyframes letter-glow {
+            0%, 100% { text-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
+            50% { text-shadow: 0 0 40px rgba(0, 212, 255, 0.6), 0 0 80px rgba(0, 212, 255, 0.2); }
+        }
+
+        @keyframes scan {
+            0% { top: 15%; opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { top: 85%; opacity: 0; }
+        }
+
+        @keyframes float-up {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) translateX(20px); opacity: 0; }
         }
 
         @media (max-height: 600px) {
-            .arc-ring { width: 140px; height: 140px; }
+            .reactor-container { width: 160px; height: 160px; }
             .initial { font-size: 3.5rem; }
             .name { font-size: 1.4rem; }
             .container { gap: 1.5rem; }
@@ -153,8 +277,25 @@
     </style>
 </head>
 <body>
+    <div class="particles" id="particles"></div>
+
     <div class="container">
-        <div class="arc-ring" id="arcRing">
+        <div class="reactor-container">
+            <div class="ring-outer"></div>
+            <div class="orbital">
+                <div class="orbital-dot"></div>
+                <div class="orbital-dot"></div>
+                <div class="orbital-dot"></div>
+                <div class="orbital-dot"></div>
+            </div>
+            <div class="ring-mid"></div>
+            <div class="orbital orbital-2">
+                <div class="orbital-dot"></div>
+                <div class="orbital-dot"></div>
+            </div>
+            <div class="ring-inner" id="arcRing"></div>
+            <div class="core-glow"></div>
+            <div class="scan-line"></div>
             <span class="initial">N</span>
         </div>
         <div style="text-align: center;">
@@ -167,6 +308,19 @@
     <elevenlabs-convai agent-id="agent_01jxr16en4e3mv4jqrqcq154tt"></elevenlabs-convai>
 
     <script>
+        // Create floating particles
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDuration = (8 + Math.random() * 12) + 's';
+            particle.style.animationDelay = (Math.random() * 10) + 's';
+            particle.style.width = (1 + Math.random() * 2) + 'px';
+            particle.style.height = particle.style.width;
+            particlesContainer.appendChild(particle);
+        }
+
         // Monitor the widget for status changes
         const observer = new MutationObserver(() => {
             const widget = document.querySelector('elevenlabs-convai');
@@ -177,14 +331,14 @@
                 const isConnected = widget.shadowRoot.querySelector('[class*="connected"]') ||
                                    widget.shadowRoot.querySelector('[class*="active"]');
                 if (isConnected) {
-                    ring.classList.add('active');
+                    ring.style.borderColor = 'rgba(0, 212, 255, 0.7)';
+                    ring.style.boxShadow = '0 0 40px rgba(0, 212, 255, 0.25), inset 0 0 40px rgba(0, 212, 255, 0.1)';
                     status.textContent = 'Connected — listening';
                     status.className = 'status connected';
                 }
             }
         });
 
-        // Start observing once widget loads
         const checkWidget = setInterval(() => {
             const widget = document.querySelector('elevenlabs-convai');
             if (widget && widget.shadowRoot) {
