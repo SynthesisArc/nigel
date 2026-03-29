@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="NIGEL">
+    <meta name="theme-color" content="#0a0a0f">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230a0a0f' width='100' height='100' rx='20'/><text x='50' y='62' font-size='40' text-anchor='middle' fill='%2300d4ff'>N</text></svg>">
+    <title>N.I.G.E.L.</title>
+    <script src="https://elevenlabs.io/convai-widget/index.js" async></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .arc-ring {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 212, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: pulse-subtle 4s ease-in-out infinite;
+        }
+
+        .arc-ring::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 212, 255, 0.08);
+            transform: scale(1.2);
+        }
+
+        .arc-ring.active {
+            border-color: rgba(0, 212, 255, 0.6);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.15), inset 0 0 40px rgba(0, 212, 255, 0.05);
+            animation: pulse-active 2s ease-in-out infinite;
+        }
+
+        .initial {
+            font-size: 4.5rem;
+            font-weight: 200;
+            color: #00d4ff;
+            letter-spacing: 0.05em;
+            opacity: 0.9;
+        }
+
+        .arc-ring.active .initial {
+            opacity: 1;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .title {
+            font-size: 0.75rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 300;
+        }
+
+        .name {
+            font-size: 1.8rem;
+            font-weight: 200;
+            letter-spacing: 0.15em;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: -0.5rem;
+        }
+
+        .status {
+            font-size: 0.8rem;
+            color: rgba(0, 212, 255, 0.5);
+            letter-spacing: 0.1em;
+            font-weight: 300;
+            min-height: 1.2em;
+            transition: all 0.3s ease;
+        }
+
+        .status.connected {
+            color: rgba(0, 212, 255, 0.8);
+        }
+
+        .status.speaking {
+            color: rgba(0, 255, 136, 0.8);
+        }
+
+        elevenlabs-convai {
+            position: fixed;
+            bottom: 2rem;
+            right: 50%;
+            transform: translateX(50%);
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { border-color: rgba(0, 212, 255, 0.15); }
+            50% { border-color: rgba(0, 212, 255, 0.25); }
+        }
+
+        @keyframes pulse-active {
+            0%, 100% {
+                border-color: rgba(0, 212, 255, 0.6);
+                box-shadow: 0 0 40px rgba(0, 212, 255, 0.15), inset 0 0 40px rgba(0, 212, 255, 0.05);
+            }
+            50% {
+                border-color: rgba(0, 212, 255, 0.9);
+                box-shadow: 0 0 60px rgba(0, 212, 255, 0.25), inset 0 0 60px rgba(0, 212, 255, 0.08);
+            }
+        }
+
+        @media (max-height: 600px) {
+            .arc-ring { width: 140px; height: 140px; }
+            .initial { font-size: 3.5rem; }
+            .name { font-size: 1.4rem; }
+            .container { gap: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="arc-ring" id="arcRing">
+            <span class="initial">N</span>
+        </div>
+        <div style="text-align: center;">
+            <div class="name">N.I.G.E.L.</div>
+            <div class="title">Neural Intelligence Gateway for Exceptional Learning</div>
+        </div>
+        <div class="status" id="status">Tap the button below to connect</div>
+    </div>
+
+    <elevenlabs-convai agent-id="agent_01jxr16en4e3mv4jqrqcq154tt"></elevenlabs-convai>
+
+    <script>
+        // Monitor the widget for status changes
+        const observer = new MutationObserver(() => {
+            const widget = document.querySelector('elevenlabs-convai');
+            const ring = document.getElementById('arcRing');
+            const status = document.getElementById('status');
+
+            if (widget && widget.shadowRoot) {
+                const isConnected = widget.shadowRoot.querySelector('[class*="connected"]') ||
+                                   widget.shadowRoot.querySelector('[class*="active"]');
+                if (isConnected) {
+                    ring.classList.add('active');
+                    status.textContent = 'Connected — listening';
+                    status.className = 'status connected';
+                }
+            }
+        });
+
+        // Start observing once widget loads
+        const checkWidget = setInterval(() => {
+            const widget = document.querySelector('elevenlabs-convai');
+            if (widget && widget.shadowRoot) {
+                observer.observe(widget.shadowRoot, {
+                    subtree: true,
+                    childList: true,
+                    attributes: true
+                });
+                clearInterval(checkWidget);
+            }
+        }, 500);
+    </script>
+</body>
+</html>
